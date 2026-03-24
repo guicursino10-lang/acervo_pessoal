@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acervos do Borges</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --bg-card: #1a1a1a;
+            --accent: #888888;
+            --accent-hover: #666666;
+            --text-main: #ffffff;
+            --text-dim: #b0b0b0;
+            --danger: #ff4444;
+            --border: #444444;
+        }
+
+        body.light {
+            --bg-dark: #ffffff;
+            --bg-card: #f5f5f5;
+            --accent: #333333;
+            --accent-hover: #555555;
+            --text-main: #000000;
+            --text-dim: #666666;
+            --danger: #ff4444;
+            --border: #dddddd;
+        }
+
+        #theme-toggle:hover { background-color: rgba(0, 0, 0, 0.1); }
+        body.light #theme-toggle:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header & Glassmorphism */
+        header {
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(40, 40, 40, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        header h1 { font-size: 2.5rem; letter-spacing: -1px; }
+        header h1 span { color: var(--accent); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        /* Barra de Ferramentas */
+        .toolbar {
+            display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1; min-width: 250px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: var(--text-main);
+            outline: none;
+            transition: 0.3s;
+        }
+        .search-box:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(136, 136, 136, 0.2); }
+
+        .btn {
+            padding: 12px 24px; border: none; border-radius: 12px;
+            cursor: pointer; font-weight: 600; transition: 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-add { background: var(--accent); color: var(--bg-dark); }
+        .btn-add:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+        /* Grid de Cards Moderno */
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover { border-color: var(--accent); transform: translateY(-4px); }
+        
+        .card-tag {
+            font-size: 0.7rem; text-transform: uppercase; font-weight: 700;
+            color: var(--accent); margin-bottom: 8px; display: block;
+        }
+
+        .card-title { font-size: 1.25rem; margin-bottom: 12px; font-weight: 700; }
+        
+        .card-actions {
+            display: flex; gap: 15px; margin-top: 20px; padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .action-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; transition: 0.2s; }
+        .action-btn:hover { color: var(--accent); }
+        .btn-del:hover { color: var(--danger); }
+
+        /* Temas/Tags */
+        .theme-badges {
+            display: flex; gap: 8px; flex-wrap: wrap; margin: 15px 0;
+        }
+
+        .theme-badge {
+            background: rgba(136, 136, 136, 0.2);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        body.light .theme-badge {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-main);
+        }
+
+        .theme-badge:hover {
+            background: rgba(136, 136, 136, 0.4);
+        }
+
+        .theme-badge.active {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        .theme-input-group {
+            display: flex; gap: 8px; margin-bottom: 15px;
+        }
+
+        .theme-input-group input {
+            flex: 1; margin: 0;
+        }
+
+        .theme-input-group button {
+            padding: 12px 20px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-dark);
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .theme-input-group button:hover {
+            background: var(--accent-hover);
+        }
+
+        .card-theme {
+            display: inline-block;
+            background: rgba(136, 136, 136, 0.3);
+            color: #d0d0d0;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        body.light .card-theme {
+            color: var(--text-dim);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal Overlay */
+        .overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .overlay.open { display: flex; }
+
+        .modal {
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 32px; border-radius: 24px; width: 100%; max-width: 900px;
+            max-height: 90vh; overflow-y: auto; position: relative;
+        }
+
+        /* Visualizador de PDF Customizado */
+        #pdf-viewer-container {
+            width: 100%; height: 600px; background: #2a2a2a;
+            border-radius: 12px; overflow: auto; margin-top: 20px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        canvas { margin-bottom: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); width: 100% !important; height: auto !important;}
+
+        input, textarea, select {
+            width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+            padding: 12px; border-radius: 8px; color: var(--text-main); margin-bottom: 15px;
+        }
+
+        .close-modal { position: absolute; top: 20px; right: 20px; color: var(--text-dim); cursor: pointer; font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle" title="Alternar Tema" style="position: fixed; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; z-index: 1000; padding: 5px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s;">🌙</button>
+
+<header>
+    <h1>Acervos <span>do Borges</span></h1>
+</header>
+
+<div class="container">
+    <div class="toolbar">
+        <input type="text" id="searchInput" class="search-box" placeholder="Pesquisar no acervo..." oninput="renderCards()">
+        <button class="btn btn-add" onclick="openModal('addModal')">Novo Texto</button>
+        <button class="btn btn-add" style="background: #666666;" onclick="openModal('pdfModal')">Importar PDF</button>
+        <button class="btn btn-add" style="background: #777777;" onclick="exportData()">💾 Backup</button>
+        <button class="btn btn-add" style="background: #888888;" onclick="importData()">📥 Restaurar</button>
+    </div>
+
+    <div id="saveIndicator" style="display:none; position: fixed; top: 20px; right: 20px; background: #777777; color: white; padding: 12px 20px; border-radius: 8px; z-index: 999; font-weight: 600; animation: slideIn 0.3s ease;">
+        ✅ Salvo com sucesso!
+    </div>
+
+    <style>
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    </style>
+
+    <div class="theme-badges" id="themesFilter">
+        <div class="theme-badge" onclick="filterByTheme(null); event.target.classList.add('active')">Todos os Temas</div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+</div>
+
+<div class="overlay" id="addModal">
+    <div class="modal">
+        <span class="close-modal" onclick="closeModal('addModal')">&times;</span>
+        <h2>Nova História</h2><br>
+        <input type="text" id="fTitle" placeholder="Título da obra">
+        
+        <label style="color: var(--text-dim); font-size: 0.9rem;">Selecione ou crie um Tema:</label>
+        <div class="theme-input-group">
+            <input type="text" id="newThemeInput" placeholder="Digite um novo tema...">
+            <button onclick="addTheme()">+ Tema</button>
+        </div>
+        
+        <div class="theme-badges" id="themeSelector"></div>
+        <input type="hidden" id="selectedTheme">
+        
+        <textarea id="fBody" rows="12" placeholder="Comece a escrever sua jornada..."></textarea>
+        <button class="btn btn-add" onclick="saveText()">Salvar no Acervo</button>
+    </div>
+</div>
+
+<div class="overlay" id="pdfModal">
+    <div class="modal" style="max-width: 500px;">
+        <span class="close-modal" onclick="closeModal('pdfModal')">&times;</span>
+        <h2>Upload de PDF</h2><br>
+        <input type="file" id="pdfInput" accept=".pdf" onchange="autoFillPDFName()">
+        
+        <label style="color: var(--text-dim); font-size: 0.9rem; display: block; margin-top: 15px;">Nome do PDF:</label>
+        <input type="text" id="pdfName" placeholder="Digite o nome do PDF...">
+        
+        <label style="color: var(--text-dim); font-size: 0.9rem;">Selecione ou crie um Tema:</label>
+        <div class="theme-input-group">
+            <input type="text" id="newThemeInputPDF" placeholder="Digite um novo tema...">
+            <button onclick="addThemePDF()">+ Tema</button>
+        </div>
+        
+        <div class="theme-badges" id="themeSelectorPDF"></div>
+        <input type="hidden" id="selectedThemePDF">
+        
+        <button class="btn btn-add" style="width: 100%;" onclick="savePDF()">Adicionar ao Acervo</button>
+    </div>
+</div>
+
+<div class="overlay" id="readModal">
+    <div class="modal">
+        <span class="close-modal" onclick="closeModal('readModal')">&times;</span>
+        <h2 id="readTitle" style="color: var(--accent);"></h2>
+        <div id="readContent" style="margin-top: 20px; white-space: pre-wrap;"></div>
+        <div id="pdf-viewer-container" style="display: none;">
+            </div>
+    </div>
+</div>
+
+<script>
+    // Configurações Iniciais
+    const GITHUB_REPO = 'guicursino10-lang/acervo_pessoal';
+    const GITHUB_BRANCH = 'main';
+    const GITHUB_TOKEN = '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';
+    const STORIES_FILE = 'historias.json';
+    const PDF_FOLDER = 'pdfs/';
+    let stories = [];
+    let themes = ['Ficção', 'Fantasia', 'Romance', 'Suspense', 'Histórico'];
+    let currentSHA = null;
+    let currentFilterTheme = null;
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    async function loadData() {
+        try {
+            const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${STORIES_FILE}?ref=${GITHUB_BRANCH}`, {
+                headers: { Authorization: `token ${GITHUB_TOKEN}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                stories = JSON.parse(atob(data.content));
+                currentSHA = data.sha;
+            } else {
+                stories = [];
+                currentSHA = null;
+            }
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            stories = [];
+        }
+        updateThemeFilters();
+        renderCards();
+    }
+
+    async function saveData() {
+        const content = btoa(JSON.stringify(stories, null, 2));
+        const body = {
+            message: 'Atualizar histórias',
+            content: content,
+            branch: GITHUB_BRANCH,
+            sha: currentSHA
+        };
+        try {
+            const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${STORIES_FILE}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `token ${GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+            if (response.ok) {
+                const data = await response.json();
+                currentSHA = data.content.sha;
+                showSaveIndicator();
+            } else {
+                alert('Erro ao salvar no GitHub');
+            }
+        } catch (error) {
+            console.error('Erro ao salvar:', error);
+        }
+    }
+
+    async function uploadPDF(file, filename) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const content = reader.result.split(',')[1];
+                const path = PDF_FOLDER + filename;
+                const body = {
+                    message: 'Adicionar PDF',
+                    content: content,
+                    branch: GITHUB_BRANCH
+                };
+                try {
+                    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
+                        method: 'PUT',
+                        headers: {
+                            Authorization: `token ${GITHUB_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+                    if (response.ok) {
+                        resolve(path);
+                    } else {
+                        reject('Erro ao upload PDF');
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function saveThemes() {
+        // Themes are local only
+        updateThemeFilters();
+        showSaveIndicator();
+    }
+
+    function showSaveIndicator() {
+        const indicator = document.getElementById('saveIndicator');
+        indicator.style.display = 'block';
+        indicator.style.animation = 'slideIn 0.3s ease';
+        setTimeout(() => {
+            indicator.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 300);
+        }, 2000);
+    }
+
+    function exportData() {
+        const backup = {
+            stories: stories,
+            themes: themes,
+            exportDate: new Date().toLocaleString('pt-BR')
+        };
+        
+        const dataStr = JSON.stringify(backup, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `acervo-backup-${new Date().getTime()}.json`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        alert('✅ Backup exportado com sucesso!');
+    }
+
+    function importData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const backup = JSON.parse(event.target.result);
+                    
+                    if(!backup.stories || !Array.isArray(backup.stories)) {
+                        return alert('❌ Arquivo de backup inválido!');
+                    }
+                    
+                    if(confirm('⚠️ Isso vai sobrescrever todos os dados atuais. Continuar?')) {
+                        stories = backup.stories;
+                        themes = backup.themes || ['Ficção', 'Fantasia', 'Romance', 'Suspense', 'Histórico'];
+                        
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
+                        localStorage.setItem(THEMES_KEY, JSON.stringify(themes));
+                        
+                        alert('✅ Dados restaurados com sucesso!');
+                        location.reload();
+                    }
+                } catch(error) {
+                    alert('❌ Erro ao ler arquivo: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    function addTheme() {
+        const input = document.getElementById('newThemeInput');
+        const theme = input.value.trim();
+        if(!theme) return alert("Digite um nome para o tema!");
+        if(themes.includes(theme)) return alert("Esse tema já existe!");
+        
+        themes.push(theme);
+        saveThemes();
+        input.value = '';
+        renderThemeSelector('addModal');
+    }
+
+    function addThemePDF() {
+        const input = document.getElementById('newThemeInputPDF');
+        const theme = input.value.trim();
+        if(!theme) return alert("Digite um nome para o tema!");
+        if(themes.includes(theme)) return alert("Esse tema já existe!");
+        
+        themes.push(theme);
+        saveThemes();
+        input.value = '';
+        renderThemeSelector('pdfModal');
+    }
+
+    function autoFillPDFName() {
+        const file = document.getElementById('pdfInput').files[0];
+        if(file) {
+            const nameWithoutExtension = file.name.replace(/\.pdf$/i, '');
+            document.getElementById('pdfName').value = nameWithoutExtension;
+        }
+    }
+
+    function selectTheme(theme, modal = 'addModal') {
+        const hidden = modal === 'pdfModal' ? 
+            document.getElementById('selectedThemePDF') : 
+            document.getElementById('selectedTheme');
+        hidden.value = theme;
+        
+        const selector = modal === 'pdfModal' ? 
+            document.getElementById('themeSelectorPDF') : 
+            document.getElementById('themeSelector');
+        
+        selector.querySelectorAll('.theme-badge').forEach(badge => {
+            badge.classList.remove('active');
+        });
+        
+        Array.from(selector.children).find(child => child.textContent.trim() === theme)?.classList.add('active');
+    }
+
+    function renderThemeSelector(modal) {
+        const selector = modal === 'pdfModal' ? 
+            document.getElementById('themeSelectorPDF') : 
+            document.getElementById('themeSelector');
+        
+        selector.innerHTML = '';
+        themes.forEach(theme => {
+            const badge = document.createElement('div');
+            badge.className = 'theme-badge';
+            badge.textContent = theme;
+            badge.onclick = () => selectTheme(theme, modal);
+            selector.appendChild(badge);
+        });
+    }
+
+    function updateThemeFilters() {
+        const container = document.getElementById('themesFilter');
+        container.innerHTML = '<div class="theme-badge active" onclick="filterByTheme(null); this.classList.add(\'active\')">Todos os Temas</div>';
+        
+        themes.forEach(theme => {
+            const badge = document.createElement('div');
+            badge.className = 'theme-badge';
+            badge.textContent = theme;
+            badge.onclick = function() {
+                document.querySelectorAll('#themesFilter .theme-badge').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filterByTheme(theme);
+            };
+            container.appendChild(badge);
+        });
+    }
+
+    function filterByTheme(theme) {
+        currentFilterTheme = theme;
+        renderCards();
+    }
+
+    function openModal(id) { 
+        document.getElementById(id).classList.add('open');
+        if(id === 'addModal' || id === 'pdfModal') {
+            renderThemeSelector(id);
+        }
+    }
+
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('open'); 
+        document.getElementById('pdf-viewer-container').innerHTML = '';
+    }
+
+    function saveText() {
+        const title = document.getElementById('fTitle').value;
+        const body = document.getElementById('fBody').value;
+        const theme = document.getElementById('selectedTheme').value;
+        
+        if(!title || !body) return alert("Campos obrigatórios!");
+        if(!theme) return alert("Selecione um tema!");
+        
+        stories.push({
+            titulo: title, body, data: new Date().toISOString().split('T')[0], categoria: theme, type: 'text'
+        });
+        saveData();
+        
+        document.getElementById('fTitle').value = '';
+        document.getElementById('fBody').value = '';
+        document.getElementById('selectedTheme').value = '';
+        closeModal('addModal');
+        renderCards();
+    }
+
+    async function savePDF() {
+        const file = document.getElementById('pdfInput').files[0];
+        const theme = document.getElementById('selectedThemePDF').value;
+        const customName = document.getElementById('pdfName').value.trim();
+        
+        if(!file) return alert("Selecione um arquivo!");
+        if(!theme) return alert("Selecione um tema!");
+        if(!customName) return alert("Digite um nome para o PDF!");
+
+        try {
+            const filename = customName + '.pdf';
+            const path = await uploadPDF(file, filename);
+            stories.push({
+                titulo: customName, caminho_pdf: path, data: new Date().toISOString().split('T')[0], categoria: theme, type: 'pdf'
+            });
+            await saveData();
+            
+            document.getElementById('pdfInput').value = '';
+            document.getElementById('pdfName').value = '';
+            document.getElementById('selectedThemePDF').value = '';
+            closeModal('pdfModal');
+            renderCards();
+        } catch (error) {
+            alert('Erro ao salvar PDF: ' + error);
+        }
+    }
+
+    async function viewStory(index) {
+        const s = stories[index];
+        document.getElementById('readTitle').innerText = s.titulo + ` [${s.categoria}]`;
+        const content = document.getElementById('readContent');
+        const pdfContainer = document.getElementById('pdf-viewer-container');
+
+        if(s.type === 'pdf') {
+            content.style.display = 'none';
+            pdfContainer.style.display = 'flex';
+            const pdfUrl = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${s.caminho_pdf}`;
+            renderPDF(pdfUrl);
+        } else {
+            content.style.display = 'block';
+            content.innerText = s.body;
+            pdfContainer.style.display = 'none';
+        }
+        openModal('readModal');
+    }
+
+    async function renderPDF(url) {
+        const container = document.getElementById('pdf-viewer-container');
+        container.innerHTML = '<p style="padding: 20px;">Carregando visualizador...</p>';
+        
+        const loadingTask = pdfjsLib.getDocument(url);
+        const pdf = await loadingTask.promise;
+        container.innerHTML = '';
+
+        for(let n = 1; n <= pdf.numPages; n++) {
+            const page = await pdf.getPage(n);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+            container.appendChild(canvas);
+        }
+    }
+
+    function deleteStory(index) {
+        if(confirm("Remover do acervo?")) {
+            stories.splice(index, 1);
+            saveData();
+            renderCards();
+        }
+    }
+
+    function renderCards() {
+        const grid = document.getElementById('grid');
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        grid.innerHTML = '';
+
+        const filtered = stories.filter(s => {
+            const matchesSearch = s.titulo.toLowerCase().includes(search);
+            const matchesTheme = currentFilterTheme === null || s.categoria === currentFilterTheme;
+            return matchesSearch && matchesTheme;
+        });
+
+        if(filtered.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 40px;">Nenhuma história encontrada</div>';
+            return;
+        }
+
+        filtered.forEach((s, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <span class="card-tag">${s.type === 'pdf' ? '📄 Documento PDF' : '📝 Texto'}</span>
+                <div class="card-title">${s.titulo}</div>
+                <div class="card-theme">🏷️ ${s.categoria}</div>
+                <div style="color: var(--text-dim); font-size: 0.85rem; margin-top: 8px;">Adicionado em ${s.data}</div>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="viewStory(${index})">👁️ Abrir</button>
+                    <button class="action-btn btn-del" onclick="deleteStory(${index})">🗑️ Deletar</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('light');
+        themeToggle.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+    });
+
+    // Inicialização
+    loadData();
+</script>
+</body>
+</html>
