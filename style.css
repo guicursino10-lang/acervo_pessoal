@@ -1,0 +1,189 @@
+/* Estilos base */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+    background-color: #000000;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Tema claro */
+body.light {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+#theme-toggle:hover { background-color: rgba(0, 0, 0, 0.1); }
+body.light #theme-toggle:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+/* Header & Glassmorphism */
+header {
+    padding: 40px 20px;
+    text-align: center;
+    background: rgba(40, 40, 40, 0.5);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #444444;
+    margin-bottom: 30px;
+}
+
+header h1 { font-size: 2.5rem; letter-spacing: -1px; }
+header h1 span { color: #888888; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+/* Barra de Ferramentas */
+.toolbar {
+    display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;
+}
+
+.search-box {
+    flex: 1; min-width: 250px;
+    background: #1a1a1a;
+    border: 1px solid #444444;
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: #ffffff;
+    outline: none;
+    transition: 0.3s;
+}
+.search-box:focus { border-color: #888888; box-shadow: 0 0 0 2px rgba(136, 136, 136, 0.2); }
+
+.btn {
+    padding: 12px 24px; border: none; border-radius: 12px;
+    cursor: pointer; font-weight: 600; transition: 0.3s;
+    display: flex; align-items: center; gap: 8px;
+}
+.btn-add { background: #888888; color: #000000; }
+.btn-add:hover { background: #666666; transform: translateY(-2px); }
+
+/* Grid de Cards Moderno */
+.grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+}
+
+.card {
+    background: #1a1a1a;
+    border: 1px solid #444444;
+    border-radius: 16px;
+    padding: 24px;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+.card:hover { border-color: #888888; transform: translateY(-4px); }
+        
+.card-tag {
+    font-size: 0.7rem; text-transform: uppercase; font-weight: 700;
+    color: #888888; margin-bottom: 8px; display: block;
+}
+
+.card-title { font-size: 1.25rem; margin-bottom: 12px; font-weight: 700; }
+        
+.card-actions {
+    display: flex; gap: 15px; margin-top: 20px; padding-top: 15px;
+    border-top: 1px solid #444444;
+}
+
+.action-btn { background: none; border: none; color: #b0b0b0; cursor: pointer; transition: 0.2s; }
+.action-btn:hover { color: #888888; }
+.btn-del:hover { color: #ff4444; }
+
+/* Temas/Tags */
+.theme-badges {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 15px 0;
+}
+
+.theme-badge {
+    background: rgba(136, 136, 136, 0.2);
+    border: 1px solid #888888;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+body.light .theme-badge {
+    background: rgba(0, 0, 0, 0.1);
+    color: #000000;
+}
+
+.theme-badge:hover {
+    background: rgba(136, 136, 136, 0.4);
+}
+
+.theme-badge.active {
+    background: #888888;
+    color: #000000;
+}
+
+.theme-input-group {
+    display: flex; gap: 8px; margin-bottom: 15px;
+}
+
+.theme-input-group input {
+    flex: 1; margin: 0;
+}
+
+.theme-input-group button {
+    padding: 12px 20px;
+    background: #888888;
+    border: none;
+    border-radius: 8px;
+    color: #000000;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.theme-input-group button:hover {
+    background: #666666;
+}
+
+.card-theme {
+    display: inline-block;
+    background: rgba(136, 136, 136, 0.3);
+    color: #d0d0d0;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+body.light .card-theme {
+    color: #666666;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Overlay */
+.overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+}
+.overlay.open { display: flex; }
+
+.modal {
+    background: #1a1a1a; border: 1px solid #444444;
+    padding: 32px; border-radius: 24px; width: 100%; max-width: 900px;
+    max-height: 90vh; overflow-y: auto; position: relative;
+}
+
+/* Visualizador de PDF Customizado */
+#pdf-viewer-container {
+    width: 100%; height: 600px; background: #2a2a2a;
+    border-radius: 12px; overflow: auto; margin-top: 20px;
+    display: flex; flex-direction: column; align-items: center;
+}
+canvas { margin-bottom: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); width: 100% !important; height: auto !important;}
+
+input, textarea, select {
+    width: 100%; background: #1a1a1a; border: 1px solid #444444;
+    padding: 12px; border-radius: 8px; color: #ffffff; margin-bottom: 15px;
+}
+
+.close-modal { position: absolute; top: 20px; right: 20px; color: #b0b0b0; cursor: pointer; font-size: 1.5rem; }
