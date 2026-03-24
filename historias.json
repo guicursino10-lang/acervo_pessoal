@@ -1,1 +1,7 @@
-[]
+{
+  "titulo": "Nome do PDF",
+  "caminho_pdf": "pdfs/nome-do-arquivo.pdf",
+  "data": "2026-03-24",
+  "categoria": "Tema Escolhido",
+  "type": "pdf"
+}
